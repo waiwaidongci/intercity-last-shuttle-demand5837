@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+
+:root {
+  --ink: oklch(24% 0.063 254); --paper: oklch(95% 0.024 248); --accent: oklch(47% 0.115 67); --panel: oklch(98% 0.014 244);
+  --accent-ink: oklch(99% .01 85);
+  --accent-soft: color-mix(in oklch,var(--accent) 13%,var(--panel));
+  --muted: color-mix(in oklch,var(--ink) 76%,var(--paper));
+  --line: color-mix(in oklch,var(--ink) 24%,var(--paper));
+  --nav: color-mix(in oklch,var(--ink) 93%,var(--accent)); --nav-ink: var(--paper);
+  --display: 'Work Sans', 'PingFang SC', 'Songti SC', serif;
+  --body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+.business-series {list-style:none;padding:0;display:grid;gap:.45rem;}
+.business-series li {display:grid;grid-template-columns:minmax(5rem,1fr) minmax(3rem,3fr) auto;gap:.7rem;align-items:center;}
+.bar-track {width:100%;height:.7rem;position:relative;background:var(--accent-soft);}
+.bar-track i {position:absolute;top:0;height:100%;background:var(--accent);}
+.hero {border:2px solid var(--accent)} .header h1 {letter-spacing:-.025em}
