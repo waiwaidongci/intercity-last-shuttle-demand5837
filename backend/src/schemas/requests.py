@@ -14,6 +14,15 @@ class Upload(Request):
     filename: str = Field(min_length=1, max_length=160)
     csv_text: str = Field(min_length=1, max_length=2_000_000)
 
+class ArrivalUpload(Upload):
+    pass
+
+class ReplayRequest(Request):
+    name: str = Field(min_length=1, max_length=120)
+    target_day: str = Field(min_length=8, max_length=10)
+    cutoff_at: str = Field(min_length=10, max_length=30)
+    params: dict = Field(default_factory=dict)
+
 class RunRequest(Request):
     dataset_id: int = Field(gt=0)
     name: str = Field(min_length=1, max_length=120)

@@ -15,3 +15,12 @@ class Review(StrEnum):
     PENDING = 'pending'
     ACCEPTED = 'accepted'
     RETURNED = 'returned'
+
+class BatchState(StrEnum):
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+
+class ReplayStatus(StrEnum):
+    COMPLETE = 'complete'
+    FAILED = 'failed'
+    SEALED = 'sealed'

@@ -77,3 +77,46 @@ def normalize_params(params):
     if set(params) - {field['key'] for field in fields}:
         raise ValueError('存在未知运行参数，请重新打开工作面板')
     return {field['key']: cell(field, params.get(field['key'], field['default'])) for field in fields}
+
+
+ARRIVAL_FIELDS = [
+    {'key': 'service_date', 'label': '运营日期', 'type': 'date'},
+    {'key': 'route', 'label': '接驳线路', 'type': 'string', 'max_length': 80},
+    {'key': 'posted_at', 'label': '入账时刻', 'type': 'string', 'max_length': 30},
+    {'key': 'passengers', 'label': '实到候车人数（含未乘上）', 'type': 'int', 'required': False,
+     'min': 0, 'max': 10000},
+    {'key': 'scheduled_seats', 'label': '已排正班座位', 'type': 'int', 'required': False,
+     'min': 0, 'max': 10000},
+]
+
+
+def parse_arrival_rows(text):
+    """解析实到补报 CSV；入账时刻格式与同刻冲突由领域引擎统一校验。"""
+    reader = csv.DictReader(io.StringIO(text.removeprefix('﻿'), newline=''), strict=True)
+    keys = {field['key'] for field in ARRIVAL_FIELDS}
+    required = {field['key'] for field in ARRIVAL_FIELDS if field.get('required', True)}
+    rows = []
+    try:
+        headers = reader.fieldnames or []
+        if not required <= set(headers) or not set(headers) <= keys or len(headers) != len(set(headers)):
+            raise ValueError('补报表头与字段说明不符，请下载补报模板检查列名')
+        for raw in reader:
+            if len(rows) >= 5000:
+                raise ValueError('一个补报批次最多导入 5000 行')
+            try:
+                if None in raw or any(value is None for value in raw.values()):
+                    raise ValueError('工作表的列数与表头不一致')
+                item = {}
+                for field in ARRIVAL_FIELDS:
+                    if field['key'] == 'posted_at':
+                        item['posted_at'] = raw.get('posted_at', '').strip()
+                    else:
+                        item[field['key']] = cell(field, raw.get(field['key']))
+                rows.append(item)
+            except ValueError as error:
+                raise ValueError(f'补报 CSV 第 {reader.line_num} 行 · {error}') from None
+    except csv.Error:
+        raise ValueError(f'补报 CSV 第 {reader.line_num} 行附近格式不正确') from None
+    if not rows:
+        raise ValueError('补报 CSV 至少需要一行有效数据')
+    return rows

@@ -7,7 +7,10 @@ export const workspace = {
   datasets: [],
   runs: [],
   async init() { this.spec = await request('/spec'); },
-  async refresh() { [this.datasets, this.runs] = await Promise.all([call('/datasets'), call('/runs')]); },
+  async refresh() {
+    const calls = [call('/datasets'), call('/runs'), call('/arrival-batches'), call('/replays')];
+    [this.datasets, this.runs, this.batches, this.replays] = await Promise.all(calls);
+  },
   getDataset: (id, offset = 0) => call(`/datasets/${id}?offset=${offset}`),
   getRun: id => call(`/runs/${id}`),
   upload: data => call('/datasets', data),
@@ -18,5 +21,9 @@ export const workspace = {
   deliveries: () => call('/deliveries'),
   schedule: data => call('/schedules', data),
   disable: id => call(`/schedules/${id}/disable`, {}),
+  arrivalRecords: () => call('/arrival-records'),
+  uploadArrival: data => call('/arrival-batches', data),
+  startReplay: data => call('/replays', data),
+  getReplay: id => call(`/replays/${id}`),
   download: (path, filename) => saveFile(path, session.token, filename),
 };
